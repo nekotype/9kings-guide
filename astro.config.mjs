@@ -10,5 +10,6 @@ export default defineConfig({
   base,
   output: 'static',
   trailingSlash: 'always',
+  markdown: { shikiConfig: { theme: 'github-dark' } },
   integrations: site ? [sitemap()] : [],
 });
