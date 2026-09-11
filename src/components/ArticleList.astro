@@ -1,0 +1,16 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { articleUrl, categoryLabel, formatDate } from '../lib/site';
+interface Props { articles: CollectionEntry<'articles'>[] }
+const { articles } = Astro.props;
+---
+{articles.length ? <ul class="article-list">
+  {articles.map(({ id, data }) => <li class="panel">
+    <div class="eyebrow"><span>{categoryLabel(data.category)}</span><time datetime={data.date.toISOString()}>{formatDate(data.date)}</time></div>
+    <h3><a href={articleUrl(id)}>{data.title}</a></h3>
+    <p>{data.description}</p>
+    {data.category === 'cards' && <p class="card-names">{data.japaneseName} / {data.englishName} · {data.cardType || '種類未確認'}</p>}
+    <p class="muted">王：{data.king}</p>
+    <ul class="tags" aria-label="タグ">{data.tags.map(tag => <li>{tag}</li>)}</ul>
+  </li>)}
+</ul> : <p class="panel">記事は準備中です。検証後に追加します。</p>}

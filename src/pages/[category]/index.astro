@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleList from '../../components/ArticleList.astro';
+import { categories, type Category, withBase } from '../../lib/site';
+export function getStaticPaths() {
+  return Object.keys(categories).map(category => ({ params: { category } }));
+}
+const category = Astro.params.category as Category;
+const info = categories[category];
+const all = (await getCollection('articles')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id));
+const articles = category === 'guides' || category === 'kings' ? all : all.filter(entry => entry.data.category === category);
+const kings = [...new Set(articles.map(entry => entry.data.king))].sort((a, b) => a.localeCompare(b, 'ja'));
+---
+<BaseLayout title={info.label} description={info.description}>
+  <p class="breadcrumb"><a href={withBase('')}>トップ</a> / {info.label}</p>
+  <h1>{info.label}</h1>
+  <p class="lead">{info.description}</p>
+  <p class="muted">全{articles.length}件</p>
+  {category === 'kings' ? <>
+    <nav class="king-index panel" aria-label="王の一覧">{kings.map((king, i) => <a href={`#king-${i}`}>{king}</a>)}</nav>
+    {kings.map((king, i) => <section aria-labelledby={`king-${i}`}><h2 id={`king-${i}`}>{king}</h2><ArticleList articles={articles.filter(entry => entry.data.king === king)} /></section>)}
+  </> : <ArticleList articles={articles} />}
+</BaseLayout>

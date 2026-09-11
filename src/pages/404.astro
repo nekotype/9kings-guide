@@ -1,0 +1,9 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { withBase } from '../lib/site';
+---
+<BaseLayout title="ページが見つかりません" description="指定されたページが見つかりませんでした。" noindex>
+  <h1>ページが見つかりません</h1>
+  <p>URLをご確認いただくか、トップページから記事をお探しください。</p>
+  <p><a href={withBase('')}>トップページへ戻る</a></p>
+</BaseLayout>

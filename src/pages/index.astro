@@ -1,0 +1,24 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleList from '../components/ArticleList.astro';
+import { categories, siteConfig, withBase } from '../lib/site';
+const articles = (await getCollection('articles')).sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf() || a.id.localeCompare(b.id));
+---
+<BaseLayout title={siteConfig.name}>
+  <section class="hero">
+    <p class="eyebrow">9 KINGS / 日本語攻略ガイド</p>
+    <h1>{siteConfig.name}</h1>
+    <p>王を知り、カードを調べ、次の攻略へ。</p>
+    <p class="muted">王ごとの攻略・クエスト・カード情報をまとめています。</p>
+  </section>
+  <aside class="notice">現在はサイト構築用のサンプル記事を掲載しています。攻略内容は検証後に追記します。</aside>
+  <section aria-labelledby="categories-title">
+    <h2 id="categories-title">カテゴリから探す</h2>
+    <div class="category-grid">{Object.entries(categories).map(([key, item]) => <a class="panel category-link" href={withBase(`${key}/`)}><h3>{item.label} <span aria-hidden="true">→</span></h3><p>{item.description}</p></a>)}</div>
+  </section>
+  <section aria-labelledby="recent-title">
+    <div class="section-heading"><h2 id="recent-title">新着記事</h2><a href={withBase('guides/')}>すべての記事を見る →</a></div>
+    <ArticleList articles={articles.slice(0, 6)} />
+  </section>
+</BaseLayout>

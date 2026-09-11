@@ -1,0 +1,49 @@
+---
+import { categories, siteConfig, withBase } from '../lib/site';
+import '../styles/global.css';
+interface Props { title: string; description?: string; article?: boolean; date?: Date; noindex?: boolean }
+const { title, description = siteConfig.description, article = false, date, noindex = false } = Astro.props;
+const pageTitle = title === siteConfig.name ? title : `${title} | ${siteConfig.name}`;
+const canonical = Astro.site && !noindex ? new URL(Astro.url.pathname, Astro.site).href : undefined;
+const ogImage = Astro.site && siteConfig.ogImage ? new URL(withBase(siteConfig.ogImage), Astro.site).href : undefined;
+---
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href={withBase('favicon.svg')} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:locale" content="ja_JP" />
+    {canonical && <meta property="og:url" content={canonical} />}
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    {date && <meta property="article:published_time" content={date.toISOString()} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">本文へ移動</a>
+    <header class="site-header">
+      <div class="container">
+        <a class="brand" href={withBase('')}>{siteConfig.name}</a>
+        <nav aria-label="メインナビゲーション">
+          <a href={withBase('')} aria-current={Astro.url.pathname === withBase('') ? 'page' : undefined}>トップ</a>
+          {Object.entries(categories).map(([key, item]) => (
+            <a href={withBase(`${key}/`)} aria-current={Astro.url.pathname === withBase(`${key}/`) ? 'page' : undefined}>{item.label}</a>
+          ))}
+        </nav>
+      </div>
+    </header>
+    <main id="main" class="container"><slot /></main>
+    <footer class="container site-footer">
+      <p>{siteConfig.name} · 非公式の日本語攻略サイト</p>
+      <p>掲載内容は検証しながら更新します。ゲームの画像・名称等の権利は各権利者に帰属します。</p>
+    </footer>
+  </body>
+</html>
